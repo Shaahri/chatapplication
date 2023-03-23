@@ -9,10 +9,10 @@ import {
 import { db } from "../firebase";
 import Message from "./Message";
 import SendMessage from "./SendMessage";
-import { MessageType } from "../types";
+import { DatabaseModel, MessageType } from "../types";
 
 const ChatBox = () => {
-    const [messages, setMessages] = useState<MessageType[]>([]);
+    const [messages, setMessages] = useState<DatabaseModel<MessageType>[]>([]);
     const scroll = useMemo(() => React.createRef<HTMLSpanElement>(), []);
 
     useEffect(() => {
@@ -23,9 +23,9 @@ const ChatBox = () => {
         );
 
         const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-            let messages: MessageType[] = [];
+            let messages: DatabaseModel<MessageType>[] = [];
             QuerySnapshot.forEach((doc) => {
-                messages.push({ ...doc.data(), id: doc.id } as MessageType);
+                messages.push({ ...doc.data(), id: doc.id } as DatabaseModel<MessageType>);
             });
             setMessages(messages);
         });

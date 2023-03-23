@@ -1,16 +1,23 @@
-import { collection, Query, query, where } from "firebase/firestore";
+import { collection, orderBy, Query, query, where } from "firebase/firestore";
 import { useMemo } from "react";
-import { useCollectionData } from "react-firebase-hooks/firestore";
 import { db } from "../firebase";
 import { MessageType } from "../types";
+import useQueryResult from "./useQueryResult";
 
 function useThreadMessages(threadId: string) {
-    const messagesQuery = ;// TODO Implement
-    
-    const [messages, loading, error, snapshot] = useCollectionData<MessageType>(messagesQuery);
-        
+    const messagesQuery = useMemo(() => {
+        if (!threadId) return;
+        return query<MessageType>(
+            collection(db, "threads") as Query<MessageType>,
+            where("threadId", "==", threadId),
+            orderBy("timestamp", "asc")
+        );
+    }, [threadId]);
+
+    const { data, loading, error } = useQueryResult<MessageType>(messagesQuery);
+
     // Return important data so the UI component can render the screen
-    return { messages: messages || [], loading, error };
+    return { messages: data || [], loading, error };
 }
 
 export default useThreadMessages;
